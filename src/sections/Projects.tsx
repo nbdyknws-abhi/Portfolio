@@ -993,7 +993,7 @@ export const AtmosphericShowcase: React.FC<ShowcaseProps> = ({ onViewChange }) =
               exit={{ opacity: 0 }}
               onClick={handleCloseModal}
               data-lenis-prevent
-              className="fixed inset-0 w-full h-full z-[100] bg-brand-black/90 backdrop-blur-md flex items-start md:items-center justify-center p-4 md:p-12 overflow-y-auto cursor-pointer"
+              className="fixed inset-0 w-full h-full z-[100] bg-brand-black/90 backdrop-blur-md flex items-start md:items-center justify-center p-4 md:p-12 overflow-y-auto overflow-x-hidden cursor-pointer"
             >
               <motion.div
                 initial={{ scale: 0.95, y: 30 }}
@@ -1475,7 +1475,7 @@ export const SystemicShowcase: React.FC<ShowcaseProps> = ({ onViewChange }) => {
               exit={{ opacity: 0 }}
               onClick={handleCloseModal}
               data-lenis-prevent
-              className="fixed inset-0 w-full h-full z-[100] bg-brand-black/90 backdrop-blur-md flex items-start md:items-center justify-center p-4 md:p-12 overflow-y-auto cursor-pointer"
+              className="fixed inset-0 w-full h-full z-[100] bg-brand-black/90 backdrop-blur-md flex items-start md:items-center justify-center p-4 md:p-12 overflow-y-auto overflow-x-hidden cursor-pointer"
             >
               <motion.div
                 initial={{ scale: 0.95, y: 30 }}
@@ -1554,9 +1554,12 @@ export const SystemicShowcase: React.FC<ShowcaseProps> = ({ onViewChange }) => {
 export const LabsShowcase: React.FC<ShowcaseProps> = ({ onViewChange }) => {
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
 
+  // Detect mobile screen for lightweight simulation defaults
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
   // Simulation Controls State
-  const [particleCount, setParticleCount] = useState(250);
-  const [speedFactor, setSpeedFactor] = useState(1.5);
+  const [particleCount, setParticleCount] = useState(isMobile ? 120 : 250);
+  const [speedFactor, setSpeedFactor] = useState(isMobile ? 1.0 : 1.5);
   const [colorTheme, setColorTheme] = useState<"amber" | "violet" | "emerald">("violet");
   const [gravityWells, setGravityWells] = useState<{ x: number; y: number }[]>([]);
 
@@ -1674,11 +1677,19 @@ export const LabsShowcase: React.FC<ShowcaseProps> = ({ onViewChange }) => {
         if (influence) {
           const dx = targetX - this.x;
           const dy = targetY - this.y;
-          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-          const force = (12 / dist) * state.speedFactor; // gravity strength
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const force = (12 / (dist + 24)) * state.speedFactor; // Soften gravity to prevent high acceleration spikes near nodes
           
-          this.vx += (dx / dist) * force;
-          this.vy += (dy / dist) * force;
+          this.vx += (dx / (dist || 1)) * force;
+          this.vy += (dy / (dist || 1)) * force;
+        }
+
+        // Speed Capping (Prevents particles from getting out of hand)
+        const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+        const maxSpeed = 10 * (state.speedFactor || 1);
+        if (speed > maxSpeed) {
+          this.vx = (this.vx / speed) * maxSpeed;
+          this.vy = (this.vy / speed) * maxSpeed;
         }
 
         // Apply friction
@@ -1690,10 +1701,10 @@ export const LabsShowcase: React.FC<ShowcaseProps> = ({ onViewChange }) => {
         this.y += this.vy;
 
         // Handle boundaries (bounce with friction)
-        if (this.x < 0) { this.x = 0; this.vx *= -0.5; }
-        if (this.x > width) { this.x = width; this.vx *= -0.5; }
-        if (this.y < 0) { this.y = 0; this.vy *= -0.5; }
-        if (this.y > height) { this.y = height; this.vy *= -0.5; }
+        if (this.x < 0) { this.x = 0; this.vx *= -0.4; }
+        if (this.x > width) { this.x = width; this.vx *= -0.4; }
+        if (this.y < 0) { this.y = 0; this.vy *= -0.4; }
+        if (this.y > height) { this.y = height; this.vy *= -0.4; }
       }
 
       draw(c: CanvasRenderingContext2D, state: typeof stateRef.current) {
@@ -1745,8 +1756,32 @@ export const LabsShowcase: React.FC<ShowcaseProps> = ({ onViewChange }) => {
       mouse.active = false;
     };
 
+    // Touch listeners for mobile support
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 0) return;
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.touches[0].clientX - rect.left;
+      mouse.y = e.touches[0].clientY - rect.top;
+      mouse.active = true;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 0) return;
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.touches[0].clientX - rect.left;
+      mouse.y = e.touches[0].clientY - rect.top;
+      mouse.active = true;
+    };
+
+    const handleTouchEnd = () => {
+      mouse.active = false;
+    };
+
     canvas.addEventListener("mousemove", handleMouseMove);
     canvas.addEventListener("mouseleave", handleMouseLeave);
+    canvas.addEventListener("touchstart", handleTouchStart, { passive: true });
+    canvas.addEventListener("touchmove", handleTouchMove, { passive: true });
+    canvas.addEventListener("touchend", handleTouchEnd, { passive: true });
 
     // Render loop
     const render = () => {
@@ -1812,6 +1847,9 @@ export const LabsShowcase: React.FC<ShowcaseProps> = ({ onViewChange }) => {
       window.removeEventListener("resize", handleResize);
       canvas.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("mouseleave", handleMouseLeave);
+      canvas.removeEventListener("touchstart", handleTouchStart);
+      canvas.removeEventListener("touchmove", handleTouchMove);
+      canvas.removeEventListener("touchend", handleTouchEnd);
     };
   }, [selectedProject]);
 
@@ -1822,8 +1860,9 @@ export const LabsShowcase: React.FC<ShowcaseProps> = ({ onViewChange }) => {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
-    // Spawn gravity well
-    setGravityWells(prev => [...prev.slice(-3), { x, y }]); // Limit to 4 gravity wells
+    // Spawn gravity well - Cap at 2 wells on mobile, 4 on desktop to keep simulation stable
+    const limit = isMobile ? -1 : -3;
+    setGravityWells(prev => [...prev.slice(limit), { x, y }]);
   };
 
   const handleInspect = (project: Project) => {
@@ -1949,7 +1988,7 @@ export const LabsShowcase: React.FC<ShowcaseProps> = ({ onViewChange }) => {
             <div className="text-[10px] font-mono text-brand-amber tracking-widest uppercase">
               INTERACTIVE VIEWPORT
             </div>
-            <div className="aspect-video md:aspect-[16/10] bg-black rounded-lg border border-white/5 relative overflow-hidden cursor-crosshair h-64">
+            <div className="w-full aspect-video md:aspect-[16/10] md:h-64 h-auto bg-black rounded-lg border border-white/5 relative overflow-hidden cursor-crosshair">
               <canvas
                 ref={canvasRef}
                 onClick={handleCanvasClick}
@@ -2319,7 +2358,7 @@ export const LabsShowcase: React.FC<ShowcaseProps> = ({ onViewChange }) => {
               exit={{ opacity: 0 }}
               onClick={handleCloseModal}
               data-lenis-prevent
-              className="fixed inset-0 w-full h-full z-[100] bg-brand-black/90 backdrop-blur-md flex items-start md:items-center justify-center p-4 md:p-12 overflow-y-auto cursor-pointer"
+              className="fixed inset-0 w-full h-full z-[100] bg-brand-black/90 backdrop-blur-md flex items-start md:items-center justify-center p-4 md:p-12 overflow-y-auto overflow-x-hidden cursor-pointer"
             >
               <motion.div
                 initial={{ scale: 0.95, y: 30 }}
