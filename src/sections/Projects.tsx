@@ -1581,6 +1581,19 @@ export const LabsShowcase: React.FC<ShowcaseProps> = ({ onViewChange }) => {
     { src: "/dark-onepiece/1.png", label: "05 // Voyage Scanning Tracker" }
   ];
 
+  // Gallery States for The Grand Line
+  const [onePieceGalleryIndex, setOnePieceGalleryIndex] = useState(0);
+  const [onePieceDirection, setOnePieceDirection] = useState(0);
+  const onePieceImages = [
+    { src: "/onepiece/2.png", label: "01 // Cinematic Intro Loading Screen" },
+    { src: "/onepiece/1.png", label: "02 // Canonical Journey Timeline" },
+    { src: "/onepiece/4.png", label: "03 // Interactive Ohara World Map" },
+    { src: "/onepiece/5.png", label: "04 // Straw Hat Crew Codex" },
+    { src: "/onepiece/6.png", label: "05 // Soundtrack Soundboard" },
+    { src: "/onepiece/7.png", label: "06 // Memories of the Sea Manga Reader" },
+    { src: "/onepiece/8.png", label: "07 // People's Dreams Splash Screen" }
+  ];
+
   // Lock body scroll when modal is open
   useEffect(() => {
     if (selectedProject) {
@@ -1891,6 +1904,41 @@ export const LabsShowcase: React.FC<ShowcaseProps> = ({ onViewChange }) => {
         </div>
       ),
     },
+    {
+      id: "03",
+      title: "THE GRAND LINE",
+      category: "STORYTELLING EXPERIENCE",
+      description:
+        "An immersive, premium web application built for fans of One Piece. Experience the voyage along the Grand Line with high-fidelity custom visuals, interactive manga archives, and localized orchestrations.",
+      stats: [
+        { label: "FEATURES", value: "Manga & Soundboard" },
+        { label: "TECH STACK", value: "React / Canvas / Tailwind" },
+      ],
+      accentColor: "#3b5998",
+      glowColor: "rgba(59, 89, 152, 0.2)",
+      liveLink: "https://onepieceisnotreal.onrender.com",
+      mockup: (
+        <div className="w-full h-full bg-zinc-950 rounded-lg relative overflow-hidden border border-white/10 group-hover:border-brand-amber/30 transition-all duration-500 flex flex-col group shadow-2xl">
+          <div className="h-6 w-full bg-zinc-900/90 border-b border-white/5 px-3 flex items-center justify-between z-10 shrink-0">
+            <div className="flex items-center space-x-1.5">
+              <span className="w-2 h-2 rounded-full bg-red-500/80" />
+              <span className="w-2 h-2 rounded-full bg-yellow-500/80" />
+              <span className="w-2 h-2 rounded-full bg-green-500/80" />
+            </div>
+            <div className="text-[7px] font-mono text-zinc-500 tracking-wider">onepieceisnotreal.onrender.com</div>
+            <div className="w-6" />
+          </div>
+          <div className="flex-1 w-full relative overflow-hidden bg-black">
+            <img
+              src="/onepiece/8.png"
+              alt="The Grand Line Splash Screen"
+              className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-zinc-950/80 to-transparent pointer-events-none" />
+          </div>
+        </div>
+      ),
+    },
   ];
 
   const renderInteractivePlayground = (project: Project) => {
@@ -2063,6 +2111,79 @@ export const LabsShowcase: React.FC<ShowcaseProps> = ({ onViewChange }) => {
             </div>
           </div>
         );
+
+      case "03": // The Grand Line Gallery
+        return (
+          <div className="space-y-6">
+            <div className="text-[10px] font-mono text-brand-amber tracking-widest uppercase">
+              PROJECT GALLERY
+            </div>
+            <div className="h-48 sm:h-60 md:h-64 rounded-lg bg-zinc-950 border border-white/5 relative overflow-hidden group touch-pan-y">
+              <AnimatePresence initial={false} custom={onePieceDirection} mode="popLayout">
+                <motion.img
+                  key={onePieceGalleryIndex}
+                  src={onePieceImages[onePieceGalleryIndex].src}
+                  alt={onePieceImages[onePieceGalleryIndex].label}
+                  custom={onePieceDirection}
+                  variants={{
+                    enter: (direction: number) => ({
+                      x: direction > 0 ? "100%" : direction < 0 ? "-100%" : 0,
+                      opacity: 0,
+                    }),
+                    center: { x: 0, opacity: 1 },
+                    exit: (direction: number) => ({
+                      x: direction < 0 ? "100%" : direction > 0 ? "-100%" : 0,
+                      opacity: 0,
+                    }),
+                  }}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{
+                    x: { type: "spring", stiffness: 300, damping: 30 },
+                    opacity: { duration: 0.2 },
+                  }}
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.6}
+                  onDragEnd={(_, info) => {
+                    const swipeThreshold = 50;
+                    if (info.offset.x < -swipeThreshold) {
+                      const nextIndex = (onePieceGalleryIndex + 1) % onePieceImages.length;
+                      setOnePieceDirection(1);
+                      setOnePieceGalleryIndex(nextIndex);
+                    } else if (info.offset.x > swipeThreshold) {
+                      const prevIndex = (onePieceGalleryIndex - 1 + onePieceImages.length) % onePieceImages.length;
+                      setOnePieceDirection(-1);
+                      setOnePieceGalleryIndex(prevIndex);
+                    }
+                  }}
+                  className="w-full h-full object-cover absolute inset-0 cursor-grab active:cursor-grabbing select-none"
+                />
+              </AnimatePresence>
+              <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent pointer-events-none z-10" />
+              <div className="absolute bottom-3 left-3 text-[8px] font-mono text-white/70 z-10 select-none uppercase">
+                {onePieceImages[onePieceGalleryIndex].label}
+              </div>
+            </div>
+            <div className="flex justify-between gap-2">
+              {onePieceImages.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setOnePieceDirection(idx > onePieceGalleryIndex ? 1 : -1);
+                    setOnePieceGalleryIndex(idx);
+                  }}
+                  className={`flex-1 h-1.5 rounded transition-colors clickable cursor-pointer ${
+                    onePieceGalleryIndex === idx ? "bg-brand-amber" : "bg-white/10 hover:bg-white/30"
+                  }`}
+                  aria-label={`View image ${idx + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
