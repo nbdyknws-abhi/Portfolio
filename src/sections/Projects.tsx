@@ -1551,9 +1551,6 @@ export const SystemicShowcase: React.FC<ShowcaseProps> = ({ onViewChange }) => {
   );
 };
 
-// ---------------------------------------------------------
-// 4. Experiential Labs (Dedicated Page)
-// ---------------------------------------------------------
 export const LabsShowcase: React.FC<ShowcaseProps> = ({ onViewChange }) => {
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
 
@@ -1570,7 +1567,34 @@ export const LabsShowcase: React.FC<ShowcaseProps> = ({ onViewChange }) => {
     stateRef.current = { particleCount, speedFactor, colorTheme, gravityWells };
   }, [particleCount, speedFactor, colorTheme, gravityWells]);
 
+  // Selected Project inside LabsShowcase
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  
+  // Gallery States for The Grand Era
+  const [grandEraGalleryIndex, setGrandEraGalleryIndex] = useState(0);
+  const [grandEraDirection, setGrandEraDirection] = useState(0);
+  const grandEraImages = [
+    { src: "/dark-onepiece/4.png", label: "01 // The Grand Era Splash Screen" },
+    { src: "/dark-onepiece/3.png", label: "02 // Universe Relationship Graph" },
+    { src: "/dark-onepiece/5.png", label: "03 // Character Overview Card" },
+    { src: "/dark-onepiece/2.png", label: "04 // Ohara Annihilation Dossier" },
+    { src: "/dark-onepiece/1.png", label: "05 // Voyage Scanning Tracker" }
+  ];
+
+  // Lock body scroll when modal is open
   useEffect(() => {
+    if (selectedProject) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [selectedProject]);
+
+  useEffect(() => {
+    if (selectedProject?.id !== "01") return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -1776,7 +1800,7 @@ export const LabsShowcase: React.FC<ShowcaseProps> = ({ onViewChange }) => {
       canvas.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, []);
+  }, [selectedProject]);
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -1787,6 +1811,261 @@ export const LabsShowcase: React.FC<ShowcaseProps> = ({ onViewChange }) => {
     
     // Spawn gravity well
     setGravityWells(prev => [...prev.slice(-3), { x, y }]); // Limit to 4 gravity wells
+  };
+
+  const handleInspect = (project: Project) => {
+    setSelectedProject(project);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedProject(null);
+  };
+
+  const projects: Project[] = [
+    {
+      id: "01",
+      title: "PHYSICS SANDBOX",
+      category: "INTERACTIVE SIMULATION",
+      description:
+        "A real-time playground for browser-physics simulations, interactive visual systems, and motion algorithms. Click anywhere in the sandbox to deploy a pulsing gravity node.",
+      stats: [
+        { label: "ENGINE", value: "HTML5 Canvas 2D" },
+        { label: "TECH STACK", value: "React / Canvas API" },
+      ],
+      accentColor: "#d4af37",
+      glowColor: "rgba(212, 175, 55, 0.2)",
+      mockup: (
+        <div className="w-full h-full bg-zinc-950 rounded-lg relative overflow-hidden border border-white/10 group-hover:border-brand-amber/30 transition-all duration-500 flex flex-col group shadow-2xl">
+          <div className="h-6 w-full bg-zinc-900/90 border-b border-white/5 px-3 flex items-center justify-between z-10 shrink-0">
+            <div className="flex items-center space-x-1.5">
+              <span className="w-2 h-2 rounded-full bg-red-500/80" />
+              <span className="w-2 h-2 rounded-full bg-yellow-500/80" />
+              <span className="w-2 h-2 rounded-full bg-green-500/80" />
+            </div>
+            <div className="text-[7px] font-mono text-zinc-500 tracking-wider">labs_sandbox.exe</div>
+            <div className="w-6" />
+          </div>
+          <div className="flex-1 w-full relative overflow-hidden bg-black">
+            <img
+              src="/labs-thumbnail.png"
+              alt="Labs Physics Sandbox"
+              className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-zinc-950/80 to-transparent pointer-events-none" />
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "02",
+      title: "THE GRAND ERA",
+      category: "CINEMATIC LORE ARCHIVE",
+      description:
+        "A premium, fully responsive cinematic storytelling platform and interactive database. Reimagines a massive pirate fantasy universe as a high-budget intelligence dossier, utilizing relationship graphs, boundary maps, and environmental canvas weather.",
+      stats: [
+        { label: "FEATURES", value: "Dossiers & Graphs" },
+        { label: "TECH STACK", value: "React / SVG Glows / Canvas" },
+      ],
+      accentColor: "#8c6d31",
+      glowColor: "rgba(140, 109, 49, 0.2)",
+      liveLink: "https://darkonepiece.onrender.com",
+      mockup: (
+        <div className="w-full h-full bg-zinc-950 rounded-lg relative overflow-hidden border border-white/10 group-hover:border-brand-amber/30 transition-all duration-500 flex flex-col group shadow-2xl">
+          <div className="h-6 w-full bg-zinc-900/90 border-b border-white/5 px-3 flex items-center justify-between z-10 shrink-0">
+            <div className="flex items-center space-x-1.5">
+              <span className="w-2 h-2 rounded-full bg-red-500/80" />
+              <span className="w-2 h-2 rounded-full bg-yellow-500/80" />
+              <span className="w-2 h-2 rounded-full bg-green-500/80" />
+            </div>
+            <div className="text-[7px] font-mono text-zinc-500 tracking-wider">darkonepiece.onrender.com</div>
+            <div className="w-6" />
+          </div>
+          <div className="flex-1 w-full relative overflow-hidden bg-black">
+            <img
+              src="/dark-onepiece/4.png"
+              alt="The Grand Era Splash Screen"
+              className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-zinc-950/80 to-transparent pointer-events-none" />
+          </div>
+        </div>
+      ),
+    },
+  ];
+
+  const renderInteractivePlayground = (project: Project) => {
+    switch (project.id) {
+      case "01": // Physics Sandbox
+        return (
+          <div className="space-y-6">
+            <div className="text-[10px] font-mono text-brand-amber tracking-widest uppercase">
+              INTERACTIVE VIEWPORT
+            </div>
+            <div className="aspect-video md:aspect-[16/10] bg-black rounded-lg border border-white/5 relative overflow-hidden cursor-crosshair h-64">
+              <canvas
+                ref={canvasRef}
+                onClick={handleCanvasClick}
+                className="w-full h-full block"
+              />
+              <div className="absolute top-3 left-3 pointer-events-none select-none text-[7px] font-mono text-zinc-500 uppercase tracking-widest space-y-0.5">
+                <div>FPS: 60 // ENGINE: 2D</div>
+                <div>CLICK CANVAS TO SPAWN WELLS</div>
+              </div>
+            </div>
+            
+            {/* Controls Console */}
+            <div className="glass-panel rounded-lg p-4 space-y-4 text-left border border-white/5">
+              {/* Slider 1: Force */}
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-center text-[9px] font-mono text-brand-gray">
+                  <span>ORBITAL FORCE</span>
+                  <span className="text-brand-light">{speedFactor.toFixed(1)}x</span>
+                </div>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="3.5"
+                  step="0.1"
+                  value={speedFactor}
+                  onChange={(e) => setSpeedFactor(Number(e.target.value))}
+                  className="w-full h-[2px] accent-brand-amber bg-brand-charcoal rounded outline-none clickable cursor-pointer"
+                />
+              </div>
+
+              {/* Slider 2: Particle Mass */}
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-center text-[9px] font-mono text-brand-gray">
+                  <span>PARTICLE MASS</span>
+                  <span className="text-brand-light">{particleCount} UNITS</span>
+                </div>
+                <input
+                  type="range"
+                  min="50"
+                  max="450"
+                  step="25"
+                  value={particleCount}
+                  onChange={(e) => setParticleCount(Number(e.target.value))}
+                  className="w-full h-[2px] accent-brand-amber bg-brand-charcoal rounded outline-none clickable cursor-pointer"
+                />
+              </div>
+
+              {/* Spectrum */}
+              <div className="space-y-2">
+                <span className="block text-[8px] font-mono text-brand-gray tracking-wider uppercase">
+                  COLOR SPECTRUM
+                </span>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {(["violet", "amber", "emerald"] as const).map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setColorTheme(t)}
+                      className={`py-1 text-[8px] font-mono rounded tracking-widest uppercase border transition-colors clickable cursor-pointer ${
+                        colorTheme === t
+                          ? "bg-brand-amber/10 border-brand-amber text-brand-amber font-semibold"
+                          : "border-white/5 hover:border-white/10 text-brand-gray"
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Attractors info and Clear button */}
+              <div className="flex justify-between items-center pt-3 border-t border-white/5">
+                <span className="text-[7px] font-mono text-brand-gray/60">
+                  ATTRACTORS: {gravityWells.length} / 4
+                </span>
+                <button
+                  onClick={() => setGravityWells([])}
+                  disabled={gravityWells.length === 0}
+                  className={`px-3 py-1.5 rounded text-[8px] font-mono tracking-widest uppercase font-semibold transition-colors clickable ${
+                    gravityWells.length > 0
+                      ? "bg-brand-light text-brand-black hover:bg-brand-amber cursor-pointer"
+                      : "border border-white/5 text-zinc-600 cursor-not-allowed"
+                  }`}
+                >
+                  Clear Wells
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+
+      case "02": // The Grand Era Gallery
+        return (
+          <div className="space-y-6">
+            <div className="text-[10px] font-mono text-brand-amber tracking-widest uppercase">
+              PROJECT GALLERY
+            </div>
+            <div className="h-48 sm:h-60 md:h-64 rounded-lg bg-zinc-950 border border-white/5 relative overflow-hidden group touch-pan-y">
+              <AnimatePresence initial={false} custom={grandEraDirection} mode="popLayout">
+                <motion.img
+                  key={grandEraGalleryIndex}
+                  src={grandEraImages[grandEraGalleryIndex].src}
+                  alt={grandEraImages[grandEraGalleryIndex].label}
+                  custom={grandEraDirection}
+                  variants={{
+                    enter: (direction: number) => ({
+                      x: direction > 0 ? "100%" : direction < 0 ? "-100%" : 0,
+                      opacity: 0,
+                    }),
+                    center: { x: 0, opacity: 1 },
+                    exit: (direction: number) => ({
+                      x: direction < 0 ? "100%" : direction > 0 ? "-100%" : 0,
+                      opacity: 0,
+                    }),
+                  }}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{
+                    x: { type: "spring", stiffness: 300, damping: 30 },
+                    opacity: { duration: 0.2 },
+                  }}
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.6}
+                  onDragEnd={(_, info) => {
+                    const swipeThreshold = 50;
+                    if (info.offset.x < -swipeThreshold) {
+                      const nextIndex = (grandEraGalleryIndex + 1) % grandEraImages.length;
+                      setGrandEraDirection(1);
+                      setGrandEraGalleryIndex(nextIndex);
+                    } else if (info.offset.x > swipeThreshold) {
+                      const prevIndex = (grandEraGalleryIndex - 1 + grandEraImages.length) % grandEraImages.length;
+                      setGrandEraDirection(-1);
+                      setGrandEraGalleryIndex(prevIndex);
+                    }
+                  }}
+                  className="w-full h-full object-cover absolute inset-0 cursor-grab active:cursor-grabbing select-none"
+                />
+              </AnimatePresence>
+              <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent pointer-events-none z-10" />
+              <div className="absolute bottom-3 left-3 text-[8px] font-mono text-white/70 z-10 select-none uppercase">
+                {grandEraImages[grandEraGalleryIndex].label}
+              </div>
+            </div>
+            <div className="flex justify-between gap-2">
+              {grandEraImages.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setGrandEraDirection(idx > grandEraGalleryIndex ? 1 : -1);
+                    setGrandEraGalleryIndex(idx);
+                  }}
+                  className={`flex-1 h-1.5 rounded transition-colors clickable cursor-pointer ${
+                    grandEraGalleryIndex === idx ? "bg-brand-amber" : "bg-white/10 hover:bg-white/30"
+                  }`}
+                  aria-label={`View image ${idx + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
@@ -1822,145 +2101,164 @@ export const LabsShowcase: React.FC<ShowcaseProps> = ({ onViewChange }) => {
             Interactive Sandboxes
           </h2>
           <p className="text-sm text-brand-gray font-light max-w-2xl leading-relaxed">
-            A real-time playground for browser-physics simulations, interactive visual systems, and motion algorithms. Click anywhere in the sandbox to deploy a pulsing gravity node.
+            Speculative prototypes, interactive physics simulators, visual algorithms, and digital playgrounds exploring advanced web capabilities.
           </p>
         </div>
 
-        {/* Live Canvas Physics sandbox container */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-8">
-          
-          {/* Canvas Viewport (Col span 8) */}
-          <div className="lg:col-span-8 relative aspect-video md:aspect-[16/10] bg-zinc-950 rounded-xl border border-white/10 p-1 flex flex-col group overflow-hidden shadow-2xl">
-            <div className="h-6 w-full bg-zinc-900/90 border-b border-white/5 px-3 flex items-center justify-between z-10 shrink-0 select-none">
-              <div className="flex items-center space-x-1.5">
-                <span className="w-2 h-2 rounded-full bg-red-500/80" />
-                <span className="w-2 h-2 rounded-full bg-yellow-500/80" />
-                <span className="w-2 h-2 rounded-full bg-green-500/80" />
-              </div>
-              <div className="text-[7px] font-mono text-zinc-500 tracking-wider">LAB_PHYSICS_ENGINE.EXE</div>
-              <div className="w-6" />
-            </div>
-
-            <div className="flex-1 w-full relative overflow-hidden bg-black cursor-crosshair">
-              <canvas
-                ref={canvasRef}
-                onClick={handleCanvasClick}
-                className="w-full h-full block"
-              />
-              <div className="absolute top-4 left-4 pointer-events-none select-none text-[8px] font-mono text-zinc-500 uppercase tracking-widest space-y-1">
-                <div>FPS: 60 // SYSTEM STATE: ACTIVE</div>
-                <div>CLICK CANVAS TO SPAWN ATTRACTION WELLS</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Simulation Dashboard Controls (Col span 4) */}
-          <div className="lg:col-span-4 glass-panel rounded-xl p-6 md:p-8 space-y-8 flex flex-col justify-between text-left h-full">
-            <div className="space-y-6">
-              <div className="flex items-baseline space-x-3">
-                <span className="text-xs font-mono text-brand-amber font-semibold">03</span>
-                <span className="text-[10px] tracking-[0.25em] text-brand-gray font-mono uppercase">
-                  — CONTROL CONSOLE
-                </span>
-              </div>
-
-              {/* Slider 1: Speed Factor */}
-              <div className="space-y-2">
-                <div className="flex justify-between items-center text-[10px] font-mono text-brand-gray">
-                  <span>ORBITAL FORCE</span>
-                  <span className="text-brand-light">{speedFactor.toFixed(1)}x</span>
-                </div>
-                <input
-                  type="range"
-                  min="0.5"
-                  max="3.5"
-                  step="0.1"
-                  value={speedFactor}
-                  onChange={(e) => setSpeedFactor(Number(e.target.value))}
-                  className="w-full h-[3px] accent-brand-amber bg-brand-charcoal rounded outline-none clickable"
-                />
-              </div>
-
-              {/* Slider 2: Particle Count */}
-              <div className="space-y-2">
-                <div className="flex justify-between items-center text-[10px] font-mono text-brand-gray">
-                  <span>PARTICLE MASS</span>
-                  <span className="text-brand-light">{particleCount} UNITS</span>
-                </div>
-                <input
-                  type="range"
-                  min="50"
-                  max="450"
-                  step="25"
-                  value={particleCount}
-                  onChange={(e) => setParticleCount(Number(e.target.value))}
-                  className="w-full h-[3px] accent-brand-amber bg-brand-charcoal rounded outline-none clickable"
-                />
-              </div>
-
-              {/* Selector: Spectrum Theme */}
-              <div className="space-y-3">
-                <span className="block text-[9px] font-mono text-brand-gray tracking-wider uppercase">
-                  COLOR SPECTRUM
-                </span>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    onClick={() => setColorTheme("violet")}
-                    className={`py-2 text-[9px] font-mono rounded tracking-widest uppercase border transition-colors clickable ${
-                      colorTheme === "violet"
-                        ? "bg-brand-amber/10 border-brand-amber text-brand-amber font-bold"
-                        : "border-white/5 hover:border-white/20 text-brand-gray"
-                    }`}
-                  >
-                    VIOLET
-                  </button>
-                  <button
-                    onClick={() => setColorTheme("amber")}
-                    className={`py-2 text-[9px] font-mono rounded tracking-widest uppercase border transition-colors clickable ${
-                      colorTheme === "amber"
-                        ? "bg-brand-amber/10 border-brand-amber text-brand-amber font-bold"
-                        : "border-white/5 hover:border-white/20 text-brand-gray"
-                    }`}
-                  >
-                    AMBER
-                  </button>
-                  <button
-                    onClick={() => setColorTheme("emerald")}
-                    className={`py-2 text-[9px] font-mono rounded tracking-widest uppercase border transition-colors clickable ${
-                      colorTheme === "emerald"
-                        ? "bg-brand-amber/10 border-brand-amber text-brand-amber font-bold"
-                        : "border-white/5 hover:border-white/20 text-brand-gray"
-                    }`}
-                  >
-                    EMERALD
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4 pt-6 border-t border-white/5">
-              <div className="text-[8px] font-mono text-brand-gray/60 space-y-1">
-                <div>ACTIVE ATTRACTORS: {gravityWells.length} / 4</div>
-                <div>RENDER METHOD: HTML5 CANVAS 2D</div>
-              </div>
-
-              <button
-                onClick={() => setGravityWells([])}
-                disabled={gravityWells.length === 0}
-                className={`w-full py-3.5 rounded text-[9px] font-mono tracking-widest uppercase font-bold border transition-all duration-300 clickable ${
-                  gravityWells.length > 0
-                    ? "bg-brand-light text-brand-black border-transparent hover:bg-brand-amber hover:scale-[1.02]"
-                    : "border-white/5 text-zinc-600 cursor-not-allowed"
-                }`}
+        {/* Projects Grid List */}
+        <div className="space-y-32 md:space-y-44 pt-12">
+          {projects.map((project, index) => {
+            const isEven = index % 2 === 0;
+            return (
+              <motion.div
+                key={project.id}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center"
               >
-                Clear Gravity Wells
-              </button>
-            </div>
-          </div>
+                <div
+                  onClick={() => handleInspect(project)}
+                  className={`lg:col-span-6 w-full aspect-video md:aspect-[16/10] relative group rounded-xl bg-brand-charcoal/30 p-2 overflow-hidden cursor-pointer ${
+                    isEven ? "lg:order-2" : ""
+                  }`}
+                >
+                  <div
+                    className="absolute inset-0 blur-[60px] opacity-30 rounded-xl transition-all duration-700 group-hover:opacity-50"
+                    style={{ background: project.glowColor }}
+                  />
+                  <div className="w-full h-full glass-panel rounded-lg p-2 relative z-10 transition-transform duration-500 group-hover:scale-[1.01] flex items-center justify-center">
+                    {project.mockup}
+                  </div>
+                </div>
 
+                <div className={`lg:col-span-6 text-left space-y-6 ${isEven ? "lg:order-1" : ""}`}>
+                  <div className="flex items-baseline space-x-3">
+                    <span className="text-xs font-mono text-brand-amber font-semibold">{project.id}</span>
+                    <span className="text-[10px] tracking-[0.25em] text-brand-gray font-mono uppercase">
+                      — {project.category}
+                    </span>
+                  </div>
+
+                  <h3
+                    onClick={() => handleInspect(project)}
+                    className="text-2xl md:text-4xl font-display font-bold tracking-wide text-brand-light hover:text-brand-amber transition-colors duration-300 cursor-pointer inline-block"
+                  >
+                    {project.title}
+                  </h3>
+
+                  <p className="text-sm text-brand-gray font-light leading-relaxed max-w-xl">
+                    {project.description}
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-6 py-4 border-t border-b border-white/5">
+                    {project.stats.map((stat, sIndex) => (
+                      <div key={sIndex} className="space-y-1">
+                        <div className="text-[9px] font-mono text-brand-gray tracking-wider uppercase">{stat.label}</div>
+                        <div className="text-sm font-semibold text-brand-light font-display">{stat.value}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-6 pt-2">
+                    <button
+                      onClick={() => handleInspect(project)}
+                      className="flex items-center space-x-2 text-[10px] font-semibold tracking-[0.2em] uppercase text-brand-amber hover:text-brand-light transition-colors duration-300 clickable cursor-pointer"
+                    >
+                      <span>Inspect Experiment</span>
+                      <ArrowUpRight size={14} />
+                    </button>
+                    {project.liveLink && (
+                      <a
+                        href={project.liveLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center space-x-2 text-[10px] font-semibold tracking-[0.2em] uppercase text-brand-light hover:text-brand-amber transition-colors duration-300 clickable"
+                      >
+                        <span>Visit Site</span>
+                        <ArrowUpRight size={14} />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
-
       </div>
+
+      {/* Cinematic Fullscreen Inspection Modal */}
+      {createPortal(
+        <AnimatePresence>
+          {selectedProject && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={handleCloseModal}
+              data-lenis-prevent
+              className="fixed inset-0 w-full h-full z-[100] bg-brand-black/90 backdrop-blur-md flex items-start md:items-center justify-center p-4 md:p-12 overflow-y-auto cursor-pointer"
+            >
+              <motion.div
+                initial={{ scale: 0.95, y: 30 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.95, y: 30 }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full max-w-5xl glass-panel-gold rounded-xl p-6 md:p-12 relative shadow-2xl flex flex-col lg:flex-row gap-8 md:gap-12 text-left cursor-default my-8 md:my-auto"
+              >
+                <button
+                  onClick={handleCloseModal}
+                  className="absolute top-6 right-6 text-brand-light/60 hover:text-brand-amber transition-colors clickable"
+                  aria-label="Close Case Study"
+                >
+                  <X size={20} />
+                </button>
+
+                <div className="flex-1 space-y-6">
+                  <div className="flex items-baseline space-x-3">
+                    <span className="text-xs font-mono text-brand-amber font-semibold">{selectedProject.id}</span>
+                    <span className="text-[10px] tracking-[0.25em] text-brand-gray font-mono uppercase">— LABS EXPERIMENT IN DETAIL</span>
+                  </div>
+                  <h3 className="text-3xl md:text-5xl font-display font-extrabold text-brand-light tracking-wide">{selectedProject.title}</h3>
+                  <p className="text-xs md:text-sm text-brand-gray leading-relaxed font-light font-sans">
+                    {selectedProject.description}
+                  </p>
+                  
+                  <div className="grid grid-cols-2 gap-6 py-4 border-t border-b border-white/5">
+                    {selectedProject.stats.map((stat, sIndex) => (
+                      <div key={sIndex} className="space-y-1">
+                        <div className="text-[9px] font-mono text-brand-gray tracking-wider uppercase">{stat.label}</div>
+                        <div className="text-sm font-semibold text-brand-light font-display">{stat.value}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                    {selectedProject.liveLink && (
+                      <a
+                        href={selectedProject.liveLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center space-x-2 text-[10px] font-semibold tracking-[0.2em] uppercase bg-brand-amber text-brand-black px-6 py-3.5 rounded hover:bg-brand-light hover:scale-[1.02] transition-all duration-300 clickable text-center"
+                      >
+                        <span>Visit Live Site</span>
+                        <ArrowUpRight size={14} />
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                <div className="w-full lg:w-[420px] shrink-0">
+                  {renderInteractivePlayground(selectedProject)}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </section>
   );
 };
