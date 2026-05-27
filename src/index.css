@@ -1,0 +1,173 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Syne:wght@500;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Syne", sans-serif;
+  --font-sans: "Plus Jakarta Sans", sans-serif;
+
+  --color-brand-black: #030303;
+  --color-brand-obsidian: #09090b;
+  --color-brand-dark: #121214;
+  --color-brand-charcoal: #18181c;
+  
+  /* Cinematic Accent Palette */
+  --color-brand-amber: #d4af37;
+  --color-brand-gold-glow: rgba(212, 175, 55, 0.08);
+  --color-brand-bronze: #8c6d31;
+  --color-brand-gray: #7e7e8a;
+  --color-brand-light: #f4f4f6;
+
+  --animate-pulse-slow: pulse 12s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-float: float 8s ease-in-out infinite;
+  --animate-spin-slow: spin 20s linear infinite;
+  --animate-fade-in: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(1deg); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* Base custom styles with global luxury texture (SVG noise + micro-dot grid) - Optimized for 60FPS */
+html, body {
+  background-color: var(--color-brand-black);
+  background-image: 
+    /* 1. Fine static organic dark paper texture (Tiled PNG - extremely optimized) */
+    url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAA9eGLYAAAAM1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABF53obAAAAnUlEQVR4AdzQMQ7EIAwEwGjB///s0G0ipJqUdG7yYIu3hR4f7R2n+D6864d3vI1XfFf9F51e8p2H98p3Vb9XvpM+/t76+Pvx24nbiZtE3CSZtEm0STKJtokyySRlkkl+kiL9pE/6pH91079d3TRtk0fKNJ+USZkkzSRlkjRJmaTMt+n0k99E3CSZJJlE3CSZJNwkmSTcJF+0VxFvYgC1qQAAAABJRU5ErkJggg=="),
+    /* 2. Micro-dot grid texture (subtle amber & white dots) */
+    radial-gradient(rgba(212, 175, 55, 0.035) 1px, transparent 0),
+    radial-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 0);
+  background-size: auto, 24px 24px, 24px 24px;
+  background-position: 0 0, 0 0, 12px 12px;
+  color: var(--color-brand-light);
+  overflow-x: hidden;
+  font-family: var(--font-sans);
+  scroll-behavior: auto; /* Handled by Lenis */
+}
+
+/* Force all section layouts to be transparent to paint background texture only once on the body layer */
+section, footer {
+  background-color: transparent !important;
+}
+
+/* Premium Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-brand-black);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-brand-charcoal);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-amber);
+}
+
+/* Custom Selection Highlight */
+::selection {
+  background-color: var(--color-brand-amber);
+  color: var(--color-brand-black);
+}
+
+/* Hide cursor on hover-enabled devices for custom cursor */
+@media (hover: hover) and (pointer: fine) {
+  body {
+    cursor: none;
+  }
+  a, button, [role="button"], input, textarea, select {
+    cursor: none;
+  }
+}
+
+/* Cinematic film grain overlay (Optimized: static texture has zero rendering and paint overhead) */
+.grain-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAA9eGLYAAAAM1BMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABF53obAAAAnUlEQVR4AdzQMQ7EIAwEwGjB///s0G0ipJqUdG7yYIu3hR4f7R2n+D6864d3vI1XfFf9F51e8p2H98p3Vb9XvpM+/t76+Pvx24nbiZtE3CSZtEm0STKJtokyySRlkkl+kiL9pE/6pH91079d3TRtk0fKNJ+USZkkzSRlkjRJmaTMt+n0k99E3CSZJJlE3CSZJNwkmSTcJF+0VxFvYgC1qQAAAABJRU5ErkJggg==") repeat;
+  opacity: 0.035;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Custom Glassmorphism styles - Optimized: rich opaque values prevent expensive GPU backdrop blurs on scroll */
+.glass-panel {
+  background: rgba(10, 10, 12, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+.glass-panel-gold {
+  background: rgba(14, 13, 11, 0.96);
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  box-shadow: 0 4px 30px rgba(212, 175, 55, 0.03);
+}
+
+.text-stroke {
+  -webkit-text-stroke: 1px rgba(244, 244, 246, 0.2);
+  color: transparent;
+}
+
+.text-stroke-hover:hover {
+  -webkit-text-stroke: 1px var(--color-brand-amber);
+  color: transparent;
+}
+
+/* Reset Root layout for custom full width design */
+#root {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  border: none !important;
+  min-height: auto !important;
+  display: block !important;
+  text-align: left !important;
+}
+
+/* Grid & glow helper utilities */
+.glow-spotlight {
+  background: radial-gradient(circle 400px at var(--x, 50%) var(--y, 50%), rgba(212, 175, 55, 0.08), transparent 80%);
+}
+
+.ambient-flare {
+  background: radial-gradient(circle at center, var(--flare-color, rgba(212, 175, 55, 0.08)), transparent 60%);
+}
+
+/* 3D Gold Textured Typography for Preloader */
+.loader-text-3d {
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #f2d06b 25%,
+    #8c6d31 50%,
+    #f2d06b 75%,
+    #ffffff 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShine 5s linear infinite;
+  
+  /* Layered 3D extrusion shadows using gold offsets and a dark shadow base */
+  filter: drop-shadow(0 1px 0px #b89028)
+          drop-shadow(0 2px 0px #9c7c25)
+          drop-shadow(0 3px 0px #82641c)
+          drop-shadow(0 4px 0px #694f13)
+          drop-shadow(0 6px 8px rgba(0, 0, 0, 0.65))
+          drop-shadow(0 12px 20px rgba(212, 175, 55, 0.15));
+}
+
+@keyframes textShine {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
